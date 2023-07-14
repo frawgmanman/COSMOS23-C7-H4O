@@ -1,0 +1,80 @@
+//gps
+#include <TinyGPSPlus.h>
+#include <SoftwareSerial.h>
+
+//gps variables
+//switch rxp,txp??
+static const int RXPin = 4, TXPin = 5;
+static const uint32_t GPSBaud = 9600;
+// The TinyGPSPlus object
+TinyGPSPlus gps;
+// The serial connection to the GPS device
+SoftwareSerial ss(RXPin, TXPin);
+
+void setup() {
+  gpsSetup();
+}
+
+void loop() {
+  gpsLoop();
+}
+
+void gpsSetup(){
+  Serial.begin(115200);
+  ss.begin(GPSBaud);
+}
+
+ String gpsLoop(){
+  while (ss.available() > 0)
+    if (gps.encode(ss.read()))
+      gpsDisplayInfo();
+
+  if (millis() > 5000 && gps.charsProcessed() < 10)
+  {
+    return ("No GPS detected: check wiring.");
+    while(true);
+  }
+}
+
+void gpsDisplayInfo{
+  String locAndTime = "";
+  for (int i = 0; i < locAndTime.length(); i++) {
+    if (locAndTime[i] == "@" || locAndTime[i] == "#" || locAndTime[i] == "$" || locAndTime[i] == "%") {
+       break;
+    }
+  }
+  if (gps.location.isValid())
+  {
+    //NOT ROUNDED!!
+    locAndTime += "@lat#" + gps.location.lat() + "$";
+    locAndTime += "@lon#" + gps.location.lng() + "$";
+  }
+  else
+  {
+    locAndTime += "INVALID";
+  }
+
+  if (gps.date.isValid())
+  {
+    locAndTime += "@mon#" + gps.date.month() + "$";
+    locAndTime += "@day#" + gps.date.day() + "$";
+    locAndTime += "@year#" + gps.date.year() + "$";
+  }
+  else
+  {
+    locAndtime += "INVALID";
+  }
+
+  if (gps.time.isValid())
+  {
+    locAndTime += "@hour#" + gps.time.hour() + "$";
+    locAndTime += "@min#" + gps.time.minute() + "$";
+    locAndTime += "@sec#" + gps.time.second() + "$";
+    locAndTime += "@csec#" + gps.time.centisecond() + "$";
+  }
+  else
+  {
+    locAndTime += "INVALID";
+  }
+  return locAndTime;
+}

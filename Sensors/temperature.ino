@@ -19,12 +19,12 @@ void setup() {
 
 void loop() {
   sensors.requestTemperatures(); 
-  float temperatureC = sensors.getTempCByIndex(0);
+  float temperatureK = sensors.getTempCByIndex(0) + 273.15;
   float temperatureF = sensors.getTempFByIndex(0);
-//   Serial.print(temperatureC);
+//   Serial.print(temperatureK);
 //   Serial.println("ºC");
 //   Serial.print(temperatureF);
 //   Serial.println("ºF");
-  Serial.println(count);
+  //Serial.println(count);
   delay(5000);
 }
