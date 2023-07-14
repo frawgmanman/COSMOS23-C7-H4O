@@ -38,6 +38,11 @@ void gpsSetup(){
 
 void gpsDisplayInfo{
   String locAndTime = "";
+  for (int i = 0; i < locAndTime.length(); i++) {
+    if (locAndTime[i] == "@" || locAndTime[i] == "#" || locAndTime[i] == "$" || locAndTime[i] == "%") {
+       break;
+    }
+  }
   if (gps.location.isValid())
   {
     //NOT ROUNDED!!
