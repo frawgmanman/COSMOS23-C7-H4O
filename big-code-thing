@@ -30,12 +30,13 @@ void gpsSetup(){
 
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
-    Serial.println(F("No GPS detected: check wiring."));
+    return ("No GPS detected: check wiring.");
     while(true);
   }
 }
 
 void gpsDisplayInfo{
+  String 
   Serial.print(F("Location: ")); 
   if (gps.location.isValid())
   {
