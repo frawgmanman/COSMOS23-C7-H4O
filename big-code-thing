@@ -16,7 +16,7 @@ String gpsDisplayInfo(){
   if (gps.location.isValid()){
   //latitude
     char lat[8];
-    dtostrf(gps.location.lat(),6,2,lat);
+    dtostrf(abs(gps.location.lat()),6,2,lat);
     if (gps.location.lat() <= 99.99 && gps.location.lat() >= 0){
       locAndTime[6] = '0';
       locAndTime[5] = '+';
@@ -37,27 +37,37 @@ String gpsDisplayInfo(){
     } 
 // longitude
     char lng[8];
-    dtostrf(gps.location.lng(),6,2,lng);
+    dtostrf(abs(gps.location.lng()),6,2,lng);
     if (gps.location.lng() <= 99.99 && gps.location.lng() >= 0){
       locAndTime[19] = '0';
       locAndTime[18] = '+';
     }else{
-      if (gps.location.lat() < 0){
+      if (gps.location.lng() < 0){
         locAndTime[18] = '-';
-        if (gps.location.lat() >= -99.99){
+        if (gps.location.lng() >= -99.99){
           locAndTime[19] = '0';
         }
       }
     }
     if (locAndTime[19] != '0'){
-        locAndTime[19] = lat[0];
+        locAndTime[19] = lng[0];
       }
     for (int i = 20; i < 25; i++){
-      locAndTime[i] = lat[i-19];  
+      locAndTime[i] = lng[i-19];  
     } 
   } 
 
   if (gps.date.isValid()){
+    char mon[3];
+    //31 32
+    sprintf(mon,"%d",gps.date.month());
+    if (gps.date.month() < 10){
+      locAndTime[31] = 0;
+      locAndTime[32] = mon[0];
+    } else{
+      locAndTime[31] = mon[0];
+      locAndTime[32] = mon[1];
+    }
     //locAndTime += "@mon#" + gps.date.month() + "$";
    // locAndTime += "@day#" + gps.date.day() + "$";
     //locAndTime += "@year#" + gps.date.year() + "$";
@@ -106,3 +116,8 @@ void loop() {
   gpsLoop();
 
 }
+
+
+
+
+
