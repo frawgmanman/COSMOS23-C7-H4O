@@ -11,23 +11,79 @@ TinyGPSPlus gps;
 // The serial connection to the GPS device
 SoftwareSerial ss(RXPin, TXPin);
 
-void setup() {
-  gpsSetup();
+String gpsDisplayInfo(){
+  char locAndTime[] = "@lat#+nnn.nn$@lon#-nnn.nn$@mon#nn$@day#nn$@year#nnnn$@hour#nn$@min#nn$@sec#nn$@csec#nn$";
+  if (gps.location.isValid()){
+  //latitude
+    char lat[8];
+    dtostrf(gps.location.lat(),6,2,lat);
+    if (gps.location.lat() <= 99.99 && gps.location.lat() >= 0){
+      locAndTime[6] = '0';
+      locAndTime[5] = '+';
+    }else{
+      if (gps.location.lat() < 0){
+        locAndTime[5] = '-';
+        if (gps.location.lat() >= -99.99){
+          locAndTime[6] = '0';
+        }
+      }
+      
+    }
+    if (locAndTime[6] != '0'){
+        locAndTime[6] = lat[0];
+      }
+    for (int i = 7; i < 12; i++){
+      locAndTime[i] = lat[i-6];  
+    } 
+// longitude
+    char lng[8];
+    dtostrf(gps.location.lng(),6,2,lng);
+    if (gps.location.lng() <= 99.99 && gps.location.lng() >= 0){
+      locAndTime[19] = '0';
+      locAndTime[18] = '+';
+    }else{
+      if (gps.location.lat() < 0){
+        locAndTime[18] = '-';
+        if (gps.location.lat() >= -99.99){
+          locAndTime[19] = '0';
+        }
+      }
+    }
+    if (locAndTime[19] != '0'){
+        locAndTime[19] = lat[0];
+      }
+    for (int i = 20; i < 25; i++){
+      locAndTime[i] = lat[i-19];  
+    } 
+  } 
+
+  if (gps.date.isValid()){
+    //locAndTime += "@mon#" + gps.date.month() + "$";
+   // locAndTime += "@day#" + gps.date.day() + "$";
+    //locAndTime += "@year#" + gps.date.year() + "$";
+  }else{
+    //locAndtime += "INVALID";
+  }
+
+  if (gps.time.isValid()){
+    //locAndTime += "@hour#" + gps.time.hour() + "$";
+    //locAndTime += "@min#" + gps.time.minute() + "$";
+    //locAndTime += "@sec#" + gps.time.second() + "$";
+    //locAndTime += "@csec#" + gps.time.centisecond() + "$";
+  }else{
+    //locAndTime += "INVALID";
+  }
+  Serial.println(locAndTime);
+  return locAndTime;
 }
 
-void loop() {
-  gpsLoop();
-}
-
-void gpsSetup(){
-  Serial.begin(115200);
-  ss.begin(GPSBaud);
-}
-
- String gpsLoop(){
-  while (ss.available() > 0)
-    if (gps.encode(ss.read()))
+String gpsLoop(){
+  while (ss.available() > 0){
+    if (gps.encode(ss.read())){
       gpsDisplayInfo();
+    } 
+  }
+      
 
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
@@ -36,46 +92,17 @@ void gpsSetup(){
   }
 }
 
-void gpsDisplayInfo{
-  char locAndTime[84] = "";
-//for loop below may not work as intended because locAndTine has the characters in the correct spots, only search for these characters within the data. 
-  //for (int i = 0; i < locAndTime.length(); i++) {
-    //if (locAndTime[i] == "@" || locAndTime[i] == "#" || locAndTime[i] == "$" || locAndTime[i] == "%") {
-     //  break;
-    //}
-  }
-  if (gps.location.isValid())
-  {
-    //NOT ROUNDED!!
-    locAndTime += "@lat#" + gps.location.lat() + "$";
-    locAndTime += "@lon#" + gps.location.lng() + "$";
-  }
-  else
-  {
-    locAndTime += "INVALID";
-  }
+void gpsSetup(){
+    Serial.begin(115200);
+    ss.begin(GPSBaud);
+}
 
-  if (gps.date.isValid())
-  {
-    locAndTime += "@mon#" + gps.date.month() + "$";
-    locAndTime += "@day#" + gps.date.day() + "$";
-    locAndTime += "@year#" + gps.date.year() + "$";
-  }
-  else
-  {
-    locAndtime += "INVALID";
-  }
 
-  if (gps.time.isValid())
-  {
-    locAndTime += "@hour#" + gps.time.hour() + "$";
-    locAndTime += "@min#" + gps.time.minute() + "$";
-    locAndTime += "@sec#" + gps.time.second() + "$";
-    locAndTime += "@csec#" + gps.time.centisecond() + "$";
-  }
-  else
-  {
-    locAndTime += "INVALID";
-  }
-  return locAndTime;
+void setup() {
+  gpsSetup();
+}
+
+void loop() {
+  gpsLoop();
+
 }
