@@ -1,6 +1,8 @@
 //gps
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
+#include <string>
+using namespace std;
 
 //gps variables
 //switch rxp,txp??
@@ -59,29 +61,72 @@ String gpsDisplayInfo(){
 
   if (gps.date.isValid()){
     char mon[3];
+    itoa(gps.date.month(), mon, 10);
     //31 32
-    sprintf(mon,"%d",gps.date.month());
     if (gps.date.month() < 10){
-      locAndTime[31] = 0;
+      locAndTime[31] = '0';
       locAndTime[32] = mon[0];
     } else{
       locAndTime[31] = mon[0];
       locAndTime[32] = mon[1];
     }
-    //locAndTime += "@mon#" + gps.date.month() + "$";
-   // locAndTime += "@day#" + gps.date.day() + "$";
-    //locAndTime += "@year#" + gps.date.year() + "$";
-  }else{
-    //locAndtime += "INVALID";
+
+    char day[3];
+    itoa(gps.date.day(), day, 10);
+    //31 32
+    if (gps.date.day() < 10){
+      locAndTime[39] = '0';
+      locAndTime[40] = day[0];
+    } else{
+      locAndTime[39] = day[0];
+      locAndTime[40] = day[1];
+    }
+    
+    char year[5];
+    itoa(gps.date.year(), year, 10);
+    for (int i = 48; i < 52; i++){
+      locAndTime[i] = year[i-48];
+    }
   }
 
   if (gps.time.isValid()){
-    //locAndTime += "@hour#" + gps.time.hour() + "$";
-    //locAndTime += "@min#" + gps.time.minute() + "$";
-    //locAndTime += "@sec#" + gps.time.second() + "$";
-    //locAndTime += "@csec#" + gps.time.centisecond() + "$";
-  }else{
-    //locAndTime += "INVALID";
+    char hour[3];
+    itoa(gps.time.hour(), hour, 10);
+    if (gps.time.hour() < 10){
+      locAndTime[59] = '0';
+      locAndTime[60] = hour[0];
+    } else{
+      locAndTime[59] = hour[0];
+      locAndTime[60] = hour[1];
+    }
+    //67 68, 75 76, 83 84
+    char min[3];
+    itoa(gps.time.minute(), min, 10);
+    if (gps.time.minute() < 10){
+      locAndTime[67] = '0';
+      locAndTime[68] = min[0];
+    } else{
+      locAndTime[67] = min[0];
+      locAndTime[68] = min[1];
+    }
+    char sec[3];
+    itoa(gps.time.second(), sec, 10);
+    if (gps.time.second() < 10){
+      locAndTime[75] = '0';
+      locAndTime[76] = sec[0];
+    } else{
+      locAndTime[75] = sec[0];
+      locAndTime[76] = sec[1];
+    }
+    char csec[3];
+    itoa(gps.time.centisecond(), csec, 10);
+    if (gps.time.centisecond() < 10){
+      locAndTime[84] = '0';
+      locAndTime[85] = csec[0];
+    } else{
+      locAndTime[84] = csec[0];
+      locAndTime[85] = csec[1];
+    }
   }
   Serial.println(locAndTime);
   return locAndTime;
@@ -116,8 +161,3 @@ void loop() {
   gpsLoop();
 
 }
-
-
-
-
-
