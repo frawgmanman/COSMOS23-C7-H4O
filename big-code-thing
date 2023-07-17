@@ -37,11 +37,12 @@ void gpsSetup(){
 }
 
 void gpsDisplayInfo{
-  String locAndTime = "";
-  for (int i = 0; i < locAndTime.length(); i++) {
-    if (locAndTime[i] == "@" || locAndTime[i] == "#" || locAndTime[i] == "$" || locAndTime[i] == "%") {
-       break;
-    }
+  char locAndTime[84] = "";
+//for loop below may not work as intended because locAndTine has the characters in the correct spots, only search for these characters within the data. 
+  //for (int i = 0; i < locAndTime.length(); i++) {
+    //if (locAndTime[i] == "@" || locAndTime[i] == "#" || locAndTime[i] == "$" || locAndTime[i] == "%") {
+     //  break;
+    //}
   }
   if (gps.location.isValid())
   {
