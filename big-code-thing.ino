@@ -1,6 +1,9 @@
 //gps
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
+//temperature
+#include <OneWire.h>
+#include <DallasTemperature.h>
 #include <string>
 using namespace std;
 
@@ -8,10 +11,17 @@ using namespace std;
 //switch rxp,txp??
 static const int RXPin = 4, TXPin = 5;
 static const uint32_t GPSBaud = 9600;
+
 // The TinyGPSPlus object
 TinyGPSPlus gps;
 // The serial connection to the GPS device
 SoftwareSerial ss(RXPin, TXPin);
+
+//temperature variables
+const int oneWireBus = 17;
+OneWire oneWire(oneWireBus);
+DallasTemperature sensors(&oneWire);
+
 
 String gpsDisplayInfo(){
   char locAndTime[] = "@lat#+nnn.nn$@lon#-nnn.nn$@mon#nn$@day#nn$@year#nnnn$@hour#nn$@min#nn$@sec#nn$@csec#nn$";
@@ -152,12 +162,48 @@ void gpsSetup(){
     ss.begin(GPSBaud);
 }
 
+String tempLoop(){
+  char tempString[] = "@temp#nnn.nn$";
+  float tempK = sensors.getTempCByIndex(0) +273.15;
+  char tValue[7];
+  // Serial.print(tempK);
+  // Serial.print(tempString);
+  dtostrf(tempK, 6, 2, tValue);
+  // Serial.println(tValue);
+  if(tempK < 100){
+    tempString[6] = '0';
+    for(int i = 0; i<5; i++){
+      tempString[i+7] = tValue[i];
+    }
+  }
+  else{
+    for(int i = 0; i<6; i++){
+      tempString[i+6] = tValue[i];
+    }
+  }
+  // Serial.println(tempString);
+  return tempString;
+}
+
+void tempSetup(){
+  sensors.begin();
+}
+
+void debug(){
+  Serial.println(tempLoop());
+  Serial.println(gpsLoop());
+}
 
 void setup() {
+  Serial.begin(115200);
   gpsSetup();
+  tempSetup();
 }
 
 void loop() {
   gpsLoop();
+  tempLoop();
+  delay(1000);
 
 }
+
