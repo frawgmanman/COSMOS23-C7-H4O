@@ -5,7 +5,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 //TDS
-#define TdsSensorPin 0 //change later
+//#define TdsSensorPin 0 //change later
 #include <string>
 using namespace std;
 
@@ -26,15 +26,15 @@ OneWire oneWire(oneWireBus);
 DallasTemperature sensors(&oneWire);
 
 //radio variables
-const byte rxPin = 12;
-const byte txPin = 13;
+const byte rxPin = 25;
+const byte txPin = 33;
 static bool tx = true;
 SoftwareSerial radioCom (rxPin, txPin);
 
 //gps
 
 String gpsDisplayInfo(){
-  char locAndTime[] = "S1@lat#+nnn.nn$@lon#-nnn.nn$@mon#nn$@day#nn$@year#nnnn$@hour#nn$@min#nn$@sec#nn$@csec#nn$%\n";
+  char locAndTime[] = "@lat#+444.44$@lon#-444.44$@mon#44$@day#44$@year#4444$@hour#44$@min#44$@sec#44$@csec#44$";
   if (gps.location.isValid()){
   //latitude
     char lat[8];
@@ -154,49 +154,50 @@ String gpsDisplayInfo(){
 String gpsLoop(){
   while (ss.available() > 0){
     if (gps.encode(ss.read())){
-      gpsDisplayInfo();
+      return gpsDisplayInfo();
     } 
   }
       
 
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
-    return ("No GPS detected: check wiring.");
+    return gpsDisplayInfo();
     while(true);
   }
 }
 
 void gpsSetup(){
-    Serial.begin(115200);
+    Serial.begin(57600);
     ss.begin(GPSBaud);
 }
 
 
 //radio
 
-void radioSetup(){
+ void radioSetup(){
   radioCom.begin(57600);
 }
 
 void radioLoop(){
-    if (tx){
+    // if (tx){
+    radioCom.print("S1");
     radioCom.print(gpsLoop());
     radioCom.print(tempLoop());
-    radioCom.println("%"); 
+    radioCom.print("%\n"); 
     delay(1000);
-    tx = false;
-  }
-  else{
-    if(Serial.available()){
-      char data =(char)Serial.read();
-      Serial.println(data);
-    }
-    if(radioCom.available()){
-      char data =(char)radioCom.read();
-      Serial.println(data);
-      tx = true;
-    }
-  }
+    // tx = false;
+  // }
+  // else{
+  //   if(Serial.available()){
+  //     char data =(char)Serial.read();
+  //     Serial.println(data);
+  //   }
+  //   if(radioCom.available()){
+  //     char data =(char)radioCom.read();
+  //     Serial.println(data);
+  //     tx = true;
+  //   }
+  // }
 }
 
 //temperature 
@@ -225,8 +226,11 @@ void tempSetup(){
 }
 
 void debug(){
-  Serial.println(tempLoop());
-  Serial.println(gpsLoop());
+  Serial.print("S1");
+  Serial.print(gpsLoop());
+  Serial.print(tempLoop());
+  Serial.print("%\n");
+  Serial.println();
 }
 
 //tds
@@ -237,7 +241,7 @@ void debug(){
 
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   gpsSetup();
   radioSetup();
   tempSetup();
@@ -245,6 +249,7 @@ void setup() {
 
 void loop() {
   radioLoop();
+  debug();
   delay(1000);
 }
 
