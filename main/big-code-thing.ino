@@ -4,8 +4,11 @@
 //temperature
 #include <OneWire.h>
 #include <DallasTemperature.h>
+//TDS
+#define TdsSensorPin 0 //change later
 #include <string>
 using namespace std;
+
 
 //gps variables
 //switch rxp,txp??
@@ -22,6 +25,13 @@ const int oneWireBus = 17;
 OneWire oneWire(oneWireBus);
 DallasTemperature sensors(&oneWire);
 
+//radio variables
+const byte rxPin = 12;
+const byte txPin = 13;
+static bool tx = true;
+SoftwareSerial radioCom (rxPin, txPin);
+
+//gps
 
 String gpsDisplayInfo(){
   char locAndTime[] = "@lat#+nnn.nn$@lon#-nnn.nn$@mon#nn$@day#nn$@year#nnnn$@hour#nn$@min#nn$@sec#nn$@csec#nn$";
@@ -138,7 +148,6 @@ String gpsDisplayInfo(){
       locAndTime[85] = csec[1];
     }
   }
-  Serial.println(locAndTime);
   return locAndTime;
 }
 
@@ -162,14 +171,41 @@ void gpsSetup(){
     ss.begin(GPSBaud);
 }
 
+
+//radio
+
+void radioSetup(){
+  radioCom.begin(57600);
+}
+
+void radioLoop(){
+    if (tx){
+    radioCom.print(gpsLoop());
+    radioCom.print(tempLoop());
+    radioCom.println("%"); 
+    delay(1000);
+    tx = false;
+  }
+  else{
+    if(Serial.available()){
+      char data =(char)Serial.read();
+      Serial.println(data);
+    }
+    if(radioCom.available()){
+      char data =(char)radioCom.read();
+      Serial.println(data);
+      tx = true;
+    }
+  }
+}
+
+//temperature 
+
 String tempLoop(){
   char tempString[] = "@temp#nnn.nn$";
   float tempK = sensors.getTempCByIndex(0) +273.15;
   char tValue[7];
-  // Serial.print(tempK);
-  // Serial.print(tempString);
   dtostrf(tempK, 6, 2, tValue);
-  // Serial.println(tValue);
   if(tempK < 100){
     tempString[6] = '0';
     for(int i = 0; i<5; i++){
@@ -181,7 +217,6 @@ String tempLoop(){
       tempString[i+6] = tValue[i];
     }
   }
-  // Serial.println(tempString);
   return tempString;
 }
 
@@ -194,16 +229,22 @@ void debug(){
   Serial.println(gpsLoop());
 }
 
+//tds
+
+
+
+//main 
+
+
 void setup() {
   Serial.begin(115200);
   gpsSetup();
+  radioSetup();
   tempSetup();
 }
 
 void loop() {
-  gpsLoop();
-  tempLoop();
+  radioLoop();
   delay(1000);
-
 }
 
