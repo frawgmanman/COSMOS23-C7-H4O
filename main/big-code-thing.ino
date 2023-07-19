@@ -8,6 +8,10 @@
 #define TdsSensorPin 0 //change later
 #include <string>
 using namespace std;
+//ph sensor code
+const int SensorPin = 15;
+float buf[10];
+int temp;
 
 
 //gps variables
@@ -154,11 +158,10 @@ String gpsDisplayInfo(){
 String gpsLoop(){
   while (ss.available() > 0){
     if (gps.encode(ss.read())){
-      gpsDisplayInfo();
+      return gpsDisplayInfo();
     } 
   }
       
-
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
     return ("No GPS detected: check wiring.");
@@ -224,9 +227,49 @@ void tempSetup(){
   sensors.begin();
 }
 
+//ph
+float getPh1() {
+  for (int i = 0; i < 10; i++) { // Get 10 sample values from the sensor to smooth the value
+    float analogVal = analogRead(SensorPin);
+    buf[i] = -0.02165*(analogVal) + 16.91709;
+    delay(10);
+  }
+  for (int i = 0; i < 9; i++) { // Sort the analog values from small to large
+    for (int j = i + 1; j < 10; j++) {
+      if (buf[i] > buf[j]) {
+        temp = buf[i];
+        buf[i] = buf[j];
+        buf[j] = temp;
+      }
+    }
+  }
+  float medianPH = buf[4];
+  delay(500);
+  return medianPH;
+}
+
+String ph1Loop() {
+  // PH1 NEEDS TO BE RECALIBRATED T-T
+  float phValue = getPh1();
+  char phAsString[6];
+  dtostrf(phValue,5,2,phAsString);
+  char ph1[] = "@pH#nn.nn$";
+  if ( phValue <= 9.99){
+    ph1[4] = 0;
+  } else{
+    ph1[4] = phAsString[0];
+  }
+  for (int i = 4; i < 9; i++){
+    ph1[i] = phAsString[i-4];
+  } 
+  return ph1;
+  delay(1000); // Delay for 1 second before taking another reading
+}
+
 void debug(){
   Serial.println(tempLoop());
   Serial.println(gpsLoop());
+  Serial.println(ph1Loop());
 }
 
 //tds
@@ -241,6 +284,7 @@ void setup() {
   gpsSetup();
   radioSetup();
   tempSetup();
+  ph1Loop();
 }
 
 void loop() {
