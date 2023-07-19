@@ -24,7 +24,7 @@ DallasTemperature sensors(&oneWire);
 
 
 String gpsDisplayInfo(){
-  char locAndTime[] = "@lat#+nnn.nn$@lon#-nnn.nn$@mon#nn$@day#nn$@year#nnnn$@hour#nn$@min#nn$@sec#nn$@csec#nn$";
+  char locAndTime[] = "S1@lat#+nnn.nn$@lon#-nnn.nn$@mon#nn$@day#nn$@year#nnnn$@hour#nn$@min#nn$@sec#nn$@csec#nn$%\n";
   if (gps.location.isValid()){
   //latitude
     char lat[8];
