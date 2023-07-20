@@ -19,6 +19,7 @@ static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
 // The serial connection to the GPS device
 SoftwareSerial ss(RXPin, TXPin);
+static const int sendTimes = 10;
 
 //temperature variables
 const int oneWireBus = 17;
@@ -30,6 +31,8 @@ const byte rxPin = 25;
 const byte txPin = 33;
 static bool tx = true;
 SoftwareSerial radioCom (rxPin, txPin);
+
+
 //ph variables
 const int SensorPin = 15;
 float buf[10];
@@ -38,7 +41,7 @@ int temp;
 //gps
 
 String gpsDisplayInfo(){
-  char locAndTime[] = "@lat#+444.44$@lon#-444.44$@mon#44$@day#44$@year#4444$@hour#44$@min#44$@sec#44$@csec#44$";
+  char locAndTime[] = "@lat#+nnn.nn$@lon#-nnn.nn$@mon#nn$@day#nn$@year#nnnn$@hour#nn$@min#nn$@sec#nn$@csec#nn$";
   if (gps.location.isValid()){
   //latitude
     char lat[8];
@@ -184,11 +187,16 @@ void gpsSetup(){
 
 void radioLoop(){
     // if (tx){
+    for(int i = 0; i < sendTimes; i++){
     radioCom.print("S1");
     radioCom.print(gpsLoop());
     radioCom.print(tempLoop());
+    radioCom.print(ph1Loop());
     radioCom.print("%\n"); 
+    delay(100);
+    }
     delay(1000);
+
     // tx = false;
   // }
   // else{
@@ -229,19 +237,13 @@ void tempSetup(){
   sensors.begin();
 }
 
-void debug(){
-  Serial.print("S1");
-  Serial.print(gpsLoop());
-  Serial.print(tempLoop());
-  Serial.print("%\n");
-  Serial.println();
-}
+//ph
 
 float getPh1() {
   for (int i = 0; i < 10; i++) { // Get 10 sample values from the sensor to smooth the value
     float analogVal = analogRead(SensorPin);
     buf[i] = -0.02165*(analogVal) + 16.91709;
-    delay(10);
+    // delay(10);
   }
   for (int i = 0; i < 9; i++) { // Sort the analog values from small to large
     for (int j = i + 1; j < 10; j++) {
@@ -253,7 +255,7 @@ float getPh1() {
     }
   }
   float medianPH = buf[4];
-  delay(500);
+  // delay(500);
   return medianPH;
 }
 
@@ -272,10 +274,21 @@ String ph1Loop() {
     ph1[i] = phAsString[i-4];
   } // Print the pH value to the serial monitor (optional)
   return ph1;
-  delay(1000); // Delay for 1 second before taking another reading
+  // delay(1000); // Delay for 1 second before taking another reading
 }
 
 
+void debug(){
+  for(int i = 0; i< sendTimes; i++){
+  Serial.print("S1");
+  Serial.print(gpsLoop());
+  Serial.print(tempLoop());
+  Serial.print(ph1Loop());
+  Serial.print("%\n");
+  Serial.println();
+  delay(100);
+  }
+}
 
 
 //tds
@@ -283,7 +296,6 @@ String ph1Loop() {
 
 
 //main 
-
 
 void setup() {
   Serial.begin(57600);
@@ -298,4 +310,3 @@ void loop() {
   debug();
   delay(1000);
 }
-
