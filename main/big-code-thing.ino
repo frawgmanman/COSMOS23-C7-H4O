@@ -5,7 +5,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 //TDS
-//#define TdsSensorPin 0 //change later
+#define TdsSensorPin 21 
 #include <string>
 using namespace std;
 
@@ -203,6 +203,7 @@ void radioLoop(){
     radioCom.print(gpsLoop());
     radioCom.print(tempLoop());
     radioCom.print(ph1Loop());
+    radioCom.print(tdsLoop());
     radioCom.print("%\n"); 
     delay(100);
     }
@@ -295,6 +296,7 @@ void debug(){
   Serial.print(gpsLoop());
   Serial.print(tempLoop());
   Serial.print(ph1Loop());
+  Serial.print(tdsLoop());
   Serial.print("%\n");
   Serial.println();
   delay(100);
@@ -334,7 +336,7 @@ int getMedianNum(int bArray[], int iFilterLen)
       return bTemp;
 }
 
-void tdsLoop()
+String tdsLoop()
 {
    static unsigned long analogSampleTimepoint = millis();
    if(millis()-analogSampleTimepoint > 40U)     //every 40 milliseconds,read the analog value from the ADC
@@ -358,25 +360,35 @@ void tdsLoop()
       //Serial.print("voltage:");
       //Serial.print(averageVoltage,2);
       //Serial.print("V   ");
-      char tdsChars[4];
-      char tds[] = "@tds#nnn$";
+      char tdsChars[5];
+      char tds[] = "@tds#nnnn$";
       itoa(tdsValue, tdsChars, 10);
       if (tdsValue < 10){
-        tds[7] = tdsChars[0];
+        tds[8] = tdsChars[0];
+        tds[7] = 0;
         tds[6] = 0;
         tds[5] = 0;
-      } else {
-        if (tdsValue < 100){
-          tds[5] = 0;
-          tds[6] = tdsChars[0];
-          tds[7] = tdsChars[1];
-        }else{
-          tds[5] = tdsChars[0];
-          tds[6] = tdsChars[1];
-          tds[7] = tdsChars[2];
-        }
+      } else if (tdsValue<100){
+        tds[5] = tdsChars[0];
+        tds[6] = tdsChars[1];
+        tds[7] = 0;
+        tds[8] = 0;
       }
+      else if(tdsValue<1000){
+        tds[5] = tdsChars[0];
+        tds[6] = tdsChars[1];
+        tds[7] = tdsChars[2];
+        tds[8] = 0;
+      }
+      else{
+        tds[5] = tdsChars[0];
+        tds[6] = tdsChars[1];
+        tds[7] = tdsChars[2];
+        tds[8] = tdsChars[3];
+      }
+      return tds; 
    }
+   
 }
 
 
@@ -388,10 +400,9 @@ void setup() {
   radioSetup();
   tempSetup();
 }
-
+//note: add sensor functions to radioLoop()! It will not work if you add it here! 
 void loop() {
   radioLoop();
-  ph1Loop();
   debug();
   delay(1000);
-}
+} 
