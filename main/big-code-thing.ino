@@ -6,9 +6,6 @@
 #include <DallasTemperature.h>
 //TDS
 #define TdsSensorPin 23 
-#include <string>
-using namespace std;
-
 
 //gps variables
 //switch rxp,txp??
