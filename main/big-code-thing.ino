@@ -5,7 +5,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 //TDS
-#define TdsSensorPin 21 
+#define TdsSensorPin 23 
 #include <string>
 using namespace std;
 
