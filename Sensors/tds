@@ -1,4 +1,4 @@
-#define TdsSensorPin A0
+#define TdsSensorPin 14
 #define VREF 5.0      // analog reference voltage(Volt) of the ADC
 #define SCOUNT  30           // sum of sample point
 int analogBuffer[SCOUNT];    // store the analog value in the array, read from ADC
