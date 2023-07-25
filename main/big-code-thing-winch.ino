@@ -21,7 +21,7 @@ String ethernetRead(){
         return data;
     }
     else{
-    return "check wiring"; 
+    return "i love sophia"; 
     }
 }
 

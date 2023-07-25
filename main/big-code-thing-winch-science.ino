@@ -51,11 +51,12 @@ float averageVoltage = 0,tdsValue = 0,temperature = 25;
 void ethernetLoop(){
     // if (tx){
     for(int i = 0; i < sendTimes; i++){
-    ethernetCom.print("S1");
-    ethernetCom.print(tempLoop());
-    ethernetCom.print(ph1Loop());
+    ethernetCom.print(getTemp());
+    ethernetCom.print("\n");
+    ethernetCom.print(getPh1());
+    ethernetCom.print("\n");
     ethernetCom.print(tdsLoop());
-    ethernetCom.print("%\n"); 
+    ethernetCom.print("\n"); 
     delay(100);
     }
     delay(1000);
@@ -77,24 +78,11 @@ void ethernetLoop(){
 
 //temperature 
 
-String tempLoop(){
-  char tempString[] = "@temp#nnn.nn$";
+float getTemp(){
   float tempK = sensors.getTempCByIndex(0) +273.15;
-  char tValue[7];
-  dtostrf(tempK, 6, 2, tValue);
-  if(tempK < 100){
-    tempString[6] = '0';
-    for(int i = 0; i<5; i++){
-      tempString[i+7] = tValue[i];
-    }
-  }
-  else{
-    for(int i = 0; i<6; i++){
-      tempString[i+6] = tValue[i];
-    }
-  }
-  return tempString;
+  return tempK;
 }
+
 
 void tempSetup(){
   sensors.begin();
@@ -122,24 +110,6 @@ float getPh1() {
   return medianPH;
 }
 
-String ph1Loop() {
-  // PH1 NEEDS TO BE RECALIBRATED T-T
-  float phValue = getPh1();
-  char phAsString[6];
-  dtostrf(phValue,5,2,phAsString);
-  char ph1[] = "@pH#nn.nn$";
-  if ( phValue <= 9.99){
-    ph1[4] = 0;
-  } else{
-    ph1[4] = phAsString[0];
-  }
-  for (int i = 4; i < 9; i++){
-    ph1[i] = phAsString[i-4];
-  } // Print the pH value to the serial monitor (optional)
-  return ph1;
-  // delay(1000); // Delay for 1 second before taking another reading
-}
-
 
 void debug(){
   for(int i = 0; i< sendTimes; i++){
@@ -154,6 +124,7 @@ void debug(){
 }
 
 
+//tds
 //tds
 void tdsSetup()
 {
@@ -186,7 +157,7 @@ int getMedianNum(int bArray[], int iFilterLen)
       return bTemp;
 }
 
-String tdsLoop()
+int getTDS()
 {
    static unsigned long analogSampleTimepoint = millis();
    if(millis()-analogSampleTimepoint > 40U)     //every 40 milliseconds,read the analog value from the ADC
@@ -210,36 +181,11 @@ String tdsLoop()
       //Serial.print("voltage:");
       //Serial.print(averageVoltage,2);
       //Serial.print("V   ");
-      char tdsChars[5];
-      char tds[] = "@tds#nnnn$";
-      itoa(tdsValue, tdsChars, 10);
-      if (tdsValue < 10){
-        tds[8] = tdsChars[0];
-        tds[7] = 0;
-        tds[6] = 0;
-        tds[5] = 0;
-      } else if (tdsValue<100){
-        tds[5] = tdsChars[0];
-        tds[6] = tdsChars[1];
-        tds[7] = 0;
-        tds[8] = 0;
-      }
-      else if(tdsValue<1000){
-        tds[5] = tdsChars[0];
-        tds[6] = tdsChars[1];
-        tds[7] = tdsChars[2];
-        tds[8] = 0;
-      }
-      else{
-        tds[5] = tdsChars[0];
-        tds[6] = tdsChars[1];
-        tds[7] = tdsChars[2];
-        tds[8] = tdsChars[3];
-      }
-      return tds; 
+      return tdsValue; 
    }
    
 }
+ 
 
 
 //main 
