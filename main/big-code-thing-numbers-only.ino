@@ -13,8 +13,24 @@
 //temperature
 #include <OneWire.h>
 #include <DallasTemperature.h>
+//ORP
+#include <EEPROM.h>
 //TDS
-#define TdsSensorPin 23 
+#define TdsSensorPin 23
+//ORP 
+#define USE_PULSE_OUT
+
+#ifdef USE_PULSE_OUT
+  #include "orp_iso_grav.h"       
+  Gravity_ORP_Isolated ORP = Gravity_ORP_Isolated(27);         
+#else
+  #include "orp_grav.h"
+  Gravity_ORP ORP = Gravity_ORP(27);
+#endif
+
+uint8_t user_bytes_received = 0;
+const uint8_t bufferlen = 32;
+char user_data[bufferlen];
 
 //gps variables
 //switch rxp,txp??
@@ -45,7 +61,7 @@ float buf[10];
 int temp;
 
 //tds variables
-#define TdsSensorPin A0
+#define TdsSensorPin 34
 //pls change sensor pin to somethign else
 #define VREF 5.0      // analog reference voltage(Volt) of the ADC
 #define SCOUNT  30           // sum of sample point
@@ -127,21 +143,6 @@ float getPh1() {
 }
 
 
-
-void debug(){
-  for(int i = 0; i< sendTimes; i++){
-  Serial.print(gpsLat());
-  Serial.print(gpsLon());
-  Serial.print(getTemp());
-  Serial.print(getPh1());
-  Serial.print(getTDS());
-  Serial.print("%\n");
-  Serial.println();
-  delay(100);
-  }
-}
-
-
 //tds
 void tdsSetup()
 {
@@ -202,12 +203,35 @@ int getTDS()
    }
    
 }
+
+int getORP(){
+
+  return ((int)ORP.read_orp()) + 500;
+ 
+}
+
+void debug(){
+  for(int i = 0; i< sendTimes; i++){
+  Serial.print(gpsLat());
+  Serial.print(gpsLon());
+  Serial.print(getTemp());
+  Serial.print(getPh1());
+  Serial.print(getORP());
+  Serial.print(getTDS());
+  Serial.print("\n");
+  Serial.println();
+  delay(100);
+  }
+}
+
+
  void radioSetup(){
   radioCom.begin(57600);
 }
 
 void radioLoop(){
     // if (tx){
+    if(ss.available()){
     for(int i = 0; i < sendTimes; i++){
     radioCom.print(gpsLat());
     radioCom.print("\n"); 
@@ -217,9 +241,12 @@ void radioLoop(){
     radioCom.print("\n"); 
     radioCom.print(getPh1());
     radioCom.print("\n"); 
+    radioCom.print(getORP());
+    radioCom.print("\n");
     radioCom.print(getTDS());
     radioCom.print("\n"); 
     delay(100);
+    }
     }
     delay(1000);
 
