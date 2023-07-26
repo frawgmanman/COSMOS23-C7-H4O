@@ -36,7 +36,7 @@ float buf[10];
 int temp;
 
 //tds variables
-#define TdsSensorPin A0
+#define TdsSensorPin 14
 //pls change sensor pin to somethign else
 #define VREF 5.0      // analog reference voltage(Volt) of the ADC
 #define SCOUNT  30           // sum of sample point
