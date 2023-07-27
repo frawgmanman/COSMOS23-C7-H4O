@@ -147,8 +147,6 @@ void sendDateAndTime(){
 float getTemp(){
   sensors.requestTemperratures();
   float tempK = sensors.getTempCByIndex(0) +273.15;
-
-  
   return tempK;
 }
 
@@ -255,6 +253,7 @@ void debug(){
   for(int i = 0; i< sendTimes; i++){
 
   sendDateAndTime();
+  delay(1000);
   if(timeSent){
     Serial.print("@lat#");
     Serial.print(gpsLat(), 8);
