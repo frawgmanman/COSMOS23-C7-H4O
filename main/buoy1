@@ -61,9 +61,8 @@ SoftwareSerial radioCom (rxPin, txPin);
 
 
 //ph variables
-const int SensorPin = 15;
-float buf[10];
-int temp;
+#include "ph_grav.h"             
+Gravity_pH pH = Gravity_pH(15);
 
 //tds variables
 #define TdsSensorPin 34
@@ -147,6 +146,8 @@ void sendDateAndTime(){
 float getTemp(){
   sensors.requestTemperatures();
   float tempK = sensors.getTempCByIndex(0) +273.15;
+
+  
   return tempK;
 }
 
@@ -157,23 +158,7 @@ void tempSetup(){
 //ph
 
 float getPh1() {
-  for (int i = 0; i < 10; i++) { // Get 10 sample values from the sensor to smooth the value
-    float analogVal = analogRead(SensorPin);
-    buf[i] = -0.02165*(analogVal) + 16.91709;
-    // delay(10);
-  }
-  for (int i = 0; i < 9; i++) { // Sort the analog values from small to large
-    for (int j = i + 1; j < 10; j++) {
-      if (buf[i] > buf[j]) {
-        temp = buf[i];
-        buf[i] = buf[j];
-        buf[j] = temp;
-      }
-    }
-  }
-  float medianPH = buf[4];
-  // delay(500);
-  return medianPH;
+ return pH.read_ph();
 }
 
 
@@ -289,6 +274,7 @@ void radioLoop(){
     for(int i = 0; i< sendTimes; i++){
     
         sendDateAndTime();
+        delay(1000);
     if(timeSent){
         radioCom.print("@lat#");
         radioCom.print(gpsLat(), 8);
