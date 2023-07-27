@@ -291,7 +291,7 @@ void radioLoop(){
     
         sendDateAndTime();
     if(timeSent){
-        radioCom.print("@lat#")
+        radioCom.print("@lat#");
         radioCom.print(gpsLat(), 8);
         radioCom.print("$@lon#");
         radioCom.print(gpsLon(), 8);
