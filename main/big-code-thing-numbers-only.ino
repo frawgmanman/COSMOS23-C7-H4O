@@ -145,7 +145,7 @@ void sendDateAndTime(){
 //temperature 
 
 float getTemp(){
-  sensors.requestTemperratures();
+  sensors.requestTemperatures();
   float tempK = sensors.getTempCByIndex(0) +273.15;
 
   
