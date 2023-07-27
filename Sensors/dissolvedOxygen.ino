@@ -9,10 +9,10 @@
 
 #ifdef USE_PULSE_OUT
   #include "do_iso_grav.h"       
-  Gravity_DO_Isolated DO = Gravity_DO_Isolated(A0);         
+  Gravity_DO_Isolated DO = Gravity_DO_Isolated(27);         
 #else
   #include "do_grav.h"
-  Gravity_DO DO = Gravity_DO(A0);
+  Gravity_DO DO = Gravity_DO(27);
 #endif
 
 uint8_t user_bytes_received = 0;
