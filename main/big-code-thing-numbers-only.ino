@@ -28,9 +28,14 @@
   Gravity_ORP ORP = Gravity_ORP(27);
 #endif
 
-uint8_t user_bytes_received = 0;
-const uint8_t bufferlen = 32;
-char user_data[bufferlen];
+//DO variables
+#ifdef USE_PULSE_OUT
+  #include "do_iso_grav.h"       
+  Gravity_DO_Isolated DO = Gravity_DO_Isolated(26);         
+#else
+  #include "do_grav.h"
+  Gravity_DO DO = Gravity_DO(26);
+#endif
 
 //gps variables
 //switch rxp,txp??
@@ -75,28 +80,28 @@ float averageVoltage = 0,tdsValue = 0,temperature = 25;
 
 double gpsLat(){
   if (gps.location.isValid()){
-    return gps.location.lat() + 180; 
+    return gps.location.lat(); 
   }
   else{
-    return 999.999999999999999;
+    return 999.99999999;
   }
 }
 
 double gpsLon(){
     if (gps.location.isValid()&&ss.available()>0){
-        return gps.location.lng() + 180;
+        return gps.location.lng();
     }
     else if (!gps.location.isValid()){
-        Serial.println("gps L");
-        return 999.999999999999999;
+        //Serial.println("gps L");
+        return 999.99999999;
     }
     else if (ss.available()<=0){
-        Serial.println("serial L");
-        return 888.888888888888888;
+        //Serial.println("serial L");
+        return 888.88888888;
     }
     else{
-        Serial.println("you problem lmao");
-        return 777.777777777777777;
+        //Serial.println("you problem lmao");
+        return 777.77777777;
     }
 }
 
@@ -104,6 +109,35 @@ double gpsLon(){
 void gpsSetup(){
     Serial.begin(57600);
     ss.begin(GPSBaud);
+}
+
+//time
+void sendDateAndTime(){
+  radioCom.print("S1@#");
+  if(gps.date.isValid()){
+    radioCom.print(gps.date.year());
+    radioCom.print("-");
+    radioCom.print(gps.date.month());
+    radioCom.print("-");
+    radioCom.print(gps.date.day());
+    radioCom.print("-");
+
+  }
+  else{
+    radioCom.print("0000-00-00-");
+  }
+  if(gps.time.isValid()){
+    radioCom.print(gps.time.hour());
+    radioCom.print("-");
+    radioCom.print(gps.time.minute());
+    radioCom.print("-");
+    radioCom.print(gps.time.second());
+
+  }
+  else{
+    radioCom.print("00-00-00");
+  }
+  radioCom.print("$");
 }
 
 
@@ -206,18 +240,33 @@ int getTDS()
 
 int getORP(){
 
-  return ((int)ORP.read_orp()) + 500;
+  return ((int)ORP.read_orp());
  
+}
+
+
+float getDO(){
+    return DO.read_do_percentage();
 }
 
 void debug(){
   for(int i = 0; i< sendTimes; i++){
-  Serial.print(gpsLat());
-  Serial.print(gpsLon());
+  sendDateAndTime();
+  Serial.print("@lat#");
+  Serial.print(gpsLat(), 8);
+  Serial.print("$@lon#");
+  Serial.print(gpsLon(), 8);
+  Serial.print("$@temp#");
   Serial.print(getTemp());
+  Serial.print("$@ph#");
   Serial.print(getPh1());
+  Serial.print("$@orp#");
   Serial.print(getORP());
+  Serial.print("$@do#");
+  Serial.print(getDO());
+  Serial.print("$@tds#");
   Serial.print(getTDS());
+  Serial.print("$%");
   Serial.print("\n");
   Serial.println();
   delay(100);
@@ -226,27 +275,31 @@ void debug(){
 
 
  void radioSetup(){
-  radioCom.begin(57600);
+  radioCom.begin(9600);
 }
 
 void radioLoop(){
     // if (tx){
     if(ss.available()){
-    for(int i = 0; i < sendTimes; i++){
-    radioCom.print(gpsLat());
-    radioCom.print("\n"); 
-    radioCom.print(gpsLon());
-    radioCom.print("\n"); 
-    radioCom.print(getTemp());
-    radioCom.print("\n"); 
-    radioCom.print(getPh1());
-    radioCom.print("\n"); 
-    radioCom.print(getORP());
-    radioCom.print("\n");
-    radioCom.print(getTDS());
-    radioCom.print("\n"); 
-    delay(100);
-    }
+    for(int i = 0; i< sendTimes; i++){
+  sendDateAndTime();
+  radioCom.print(gpsLat(), 8);
+  radioCom.print("$@lon#");
+  radioCom.print(gpsLon(), 8);
+  radioCom.print("$@temp#");
+  radioCom.print(getTemp());
+  radioCom.print("$@ph#");
+  radioCom.print(getPh1());
+  radioCom.print("$@orp#");
+  radioCom.print(getORP());
+  radioCom.print("$@do#");
+  radioCom.print(getDO());
+  radioCom.print("$@tds#");
+  radioCom.print(getTDS());
+  radioCom.print("$%");
+  radioCom.print("\n");
+  delay(500);
+  }
     }
     delay(1000);
 
@@ -279,7 +332,3 @@ void loop() {
   debug();
   delay(1000);
 } 
-
-
-
-
