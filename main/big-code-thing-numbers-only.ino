@@ -285,11 +285,12 @@ void debug(){
 
 void radioLoop(){
     // if (tx){
-    if(ss.available()){
+    if(radioCom.available()){
     for(int i = 0; i< sendTimes; i++){
     
         sendDateAndTime();
     if(timeSent){
+        radioCom.print("@lat#")
         radioCom.print(gpsLat(), 8);
         radioCom.print("$@lon#");
         radioCom.print(gpsLon(), 8);
