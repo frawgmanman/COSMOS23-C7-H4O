@@ -75,7 +75,7 @@ int analogBufferTemp[SCOUNT];
 int analogBufferIndex = 0,copyIndex = 0;
 float averageVoltage = 0,tdsValue = 0,temperature = 25;
 
-
+static bool timeSent = false;
 //gps
 
 double gpsLat(){
@@ -138,6 +138,7 @@ void sendDateAndTime(){
     radioCom.print("00-00-00");
   }
   radioCom.print("$");
+  timeSent = true; 
 }
 
 
@@ -251,25 +252,29 @@ float getDO(){
 
 void debug(){
   for(int i = 0; i< sendTimes; i++){
+
   sendDateAndTime();
-  Serial.print("@lat#");
-  Serial.print(gpsLat(), 8);
-  Serial.print("$@lon#");
-  Serial.print(gpsLon(), 8);
-  Serial.print("$@temp#");
-  Serial.print(getTemp());
-  Serial.print("$@ph#");
-  Serial.print(getPh1());
-  Serial.print("$@orp#");
-  Serial.print(getORP());
-  Serial.print("$@do#");
-  Serial.print(getDO());
-  Serial.print("$@tds#");
-  Serial.print(getTDS());
-  Serial.print("$%");
-  Serial.print("\n");
-  Serial.println();
-  delay(100);
+  if(timeSent){
+    Serial.print("@lat#");
+    Serial.print(gpsLat(), 8);
+    Serial.print("$@lon#");
+    Serial.print(gpsLon(), 8);
+    Serial.print("$@temp#");
+    Serial.print(getTemp());
+    Serial.print("$@ph#");
+    Serial.print(getPh1());
+    Serial.print("$@orp#");
+    Serial.print(getORP());
+    Serial.print("$@do#");
+    Serial.print(getDO());
+    Serial.print("$@tds#");
+    Serial.print(getTDS());
+    Serial.print("$%");
+    Serial.print("\n");
+    Serial.println();
+    timeSent = false;
+    delay(100);
+  }
   }
 }
 
