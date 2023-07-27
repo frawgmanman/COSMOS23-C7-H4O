@@ -287,23 +287,27 @@ void radioLoop(){
     // if (tx){
     if(ss.available()){
     for(int i = 0; i< sendTimes; i++){
-  sendDateAndTime();
-  radioCom.print(gpsLat(), 8);
-  radioCom.print("$@lon#");
-  radioCom.print(gpsLon(), 8);
-  radioCom.print("$@temp#");
-  radioCom.print(getTemp());
-  radioCom.print("$@ph#");
-  radioCom.print(getPh1());
-  radioCom.print("$@orp#");
-  radioCom.print(getORP());
-  radioCom.print("$@do#");
-  radioCom.print(getDO());
-  radioCom.print("$@tds#");
-  radioCom.print(getTDS());
-  radioCom.print("$%");
-  radioCom.print("\n");
-  delay(500);
+    
+        sendDateAndTime();
+    if(timeSent){
+        radioCom.print(gpsLat(), 8);
+        radioCom.print("$@lon#");
+        radioCom.print(gpsLon(), 8);
+        radioCom.print("$@temp#");
+        radioCom.print(getTemp());
+        radioCom.print("$@ph#");
+        radioCom.print(getPh1());
+        radioCom.print("$@orp#");
+        radioCom.print(getORP());
+        radioCom.print("$@do#");
+        radioCom.print(getDO());
+        radioCom.print("$@tds#");
+        radioCom.print(getTDS());
+        radioCom.print("$%");
+        radioCom.print("\n");
+        timeSent = false; 
+        delay(100); 
+    }
   }
     }
     delay(1000);
