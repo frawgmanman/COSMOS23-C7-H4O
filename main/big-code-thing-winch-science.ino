@@ -28,11 +28,11 @@ int temp;
 //ethernet
 
  void ethernetSetup(){
-  ethernetCom.begin(57600);
+  ethernetCom.begin(9600);
 }
-String eRead(){
+char eRead(){
     if(ethernetCom.available()){
-        char data = (char)eCom.read();
+        char data = (char)ethernetCom.read();
         return data;
     }
     // else{
@@ -40,41 +40,15 @@ String eRead(){
     // }
 }
 void ethernetLoop(){
-    if (!dataSent){
-    //for(int i = 0; i < sendTimes; i++){
-    while(!readyToSend){
-      char data = eRead();
-      if(data = '?'){
-        readyToSend = true; 
-        ethernetCom.print('^');
-      }
-    }
-    delay(500);
-    ethernetCom.print("@temp#");
-    ethernetCom.print(getTemp());
-    ethernetCom.print("$@ph#");
-    ethernetCom.print(getPh1());
-    ethernetCom.print("$%");
+   if(ethernetCom.available()){
+    // ethernetCom.print("@temp#");
+    // ethernetCom.print(getTemp());
+    // ethernetCom.print("$@ph#");
+    // ethernetCom.print(getPh1());
+    // ethernetCom.print("$%");
+    ethernetCom.println("AHHHHHHHH");
   
-    dataSent = true;
-    readyToSend = false; 
-   // }
-    
    }
-  else{
-    if(Serial.available()){
-      char data =(char)Serial.read();
-      Serial.println(data);
-    }
-    if(ethernetCom.available()){
-      char data =(char)ethernetCom.read();
-      Serial.println(data);
-      if(data = '!'){
-      ethernetCom.print("*");
-      dataSent = false;
-      }
-    }
-  }
 }
 
 //temperature 
@@ -116,9 +90,8 @@ float getPh1() {
 void debug(){
   for(int i = 0; i< sendTimes; i++){
   Serial.print("S1");
-  Serial.print(tempLoop());
-  Serial.print(ph1Loop());
-  Serial.print(tdsLoop());
+  Serial.print(getTemp());
+  Serial.print(getPh1());
   Serial.print("%\n");
   Serial.println();
   delay(100);
@@ -129,7 +102,7 @@ void debug(){
 //main 
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(9600);
   ethernetSetup();
   tempSetup();
 }

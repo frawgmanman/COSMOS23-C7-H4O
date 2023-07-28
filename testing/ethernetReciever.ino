@@ -12,7 +12,7 @@ void setup(){
 }
 
 void loop(){
-    if(ethernetCom.available()){
+    if(eCom.available()){
         char data = (char)eCom.read();
         Serial.println(data);
     }

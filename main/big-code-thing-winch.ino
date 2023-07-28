@@ -25,7 +25,7 @@ static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
 // The serial connection to the GPS device
 SoftwareSerial ss(RXPin, TXPin);
-static const int sendTimes = 10;
+static const int sendTime = 10;
 static bool timeSent = false;
 
 
@@ -114,14 +114,12 @@ void gpsSetup(){
 }
 
 //ethernet
-String eRead(){
+char eRead(){
     if(eCom.available()){
         char data = (char)eCom.read();
         return data;
     }
-    else{
-    return "i love sophia"; 
-    }
+  
 }
 
 //radio
@@ -130,53 +128,70 @@ void radioSetup(){
 }
 void sendRadio(){
     if(radioCom.available()){
-    for(int i = 0; i< sendTime; i++){
-        sendDateAndTime();
-        delay(500);
-        if(timeSent){
+            radioCom.print("S1@#");
+    if(gps.date.isValid()){
+        radioCom.print(gps.date.year());
+        radioCom.print("-");
+        radioCom.print(gps.date.month());
+        radioCom.print("-");
+        radioCom.print(gps.date.day());
+        radioCom.print("-");
+
+    }
+    else{
+        radioCom.print("0000-00-00-");
+    }
+    if(gps.time.isValid()){
+        radioCom.print(gps.time.hour());
+        radioCom.print("-");
+        radioCom.print(gps.time.minute());
+        radioCom.print("-");
+        radioCom.print(gps.time.second());
+
+    }
+    else{
+        radioCom.print("00-00-00");
+    }
+            radioCom.print("$");
             radioCom.print("@lat#");
             radioCom.print(gpsLat(), 8);
             radioCom.print("$@lon#");
             radioCom.print(gpsLon(), 8);
-            eCom.print('?');
-            while(!startPacket){
-                char handshake = eRead();
-                if(handshake = '^'){
-                    startPacket = true; 
-                }
-            }
-            while(!endPacket){
-                char data = eRead();
+            char data; 
+           
+            while(data!='%'){
+              if(eCom.available()){
+                data = eRead();
                 radioCom.print(data);
-                Serial.print(data); //debugging
-                if(data = "%"){
-                    endPacket = true;
-                    eCom.print('!');
-                }
+              }
             }
-        radioCom.print("\n");
-        Serial.print("\n");
-         timeSent = false;
-         startPacket = false; 
-         endPacket = false; 
-        }
-    }
+          
+            radioCom.print("\n");
+        
     }
     
 }
 void debug(){
+  char data;
+  
+    while(data!='%'){
+        data = eRead();
+        Serial.print(data);
+    }
+    Serial.print("\n");
     
 }
 
 
 
 void setup(){
-Serial.begin(57600);
+Serial.begin(9600);
 gpsSetup();
 radioSetup();
-
+eCom.begin(9600);
 }
 
 void loop(){
 sendRadio();
+debug();
 }
