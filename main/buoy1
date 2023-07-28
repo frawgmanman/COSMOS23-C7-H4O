@@ -61,8 +61,9 @@ SoftwareSerial radioCom (rxPin, txPin);
 
 
 //ph variables
-#include "ph_grav.h"             
-Gravity_pH pH = Gravity_pH(15);
+const int SensorPin = 15;
+float buf[10];
+int temp;
 
 //tds variables
 #define TdsSensorPin 34
@@ -110,33 +111,26 @@ void gpsSetup(){
     ss.begin(GPSBaud);
 }
 
-//time
+//time --> not using
 void sendDateAndTime(){
-  radioCom.print("S1@#");
+  String dateAndTime = "S1@#";
   if(gps.date.isValid()){
-    radioCom.print(gps.date.year());
-    radioCom.print("-");
-    radioCom.print(gps.date.month());
-    radioCom.print("-");
-    radioCom.print(gps.date.day());
-    radioCom.print("-");
-
+    dateAndTime = dateAndTime + gps.date.year() + "-";
+    dateAndTime = dateAndTime + gps.date.month() + "-";
+    dateAndTime = dateAndTime + gps.date.day() + "-";
   }
   else{
-    radioCom.print("0000-00-00-");
+    dateAndTime = dateAndTime + "0000-00-00-";
   }
   if(gps.time.isValid()){
-    radioCom.print(gps.time.hour());
-    radioCom.print("-");
-    radioCom.print(gps.time.minute());
-    radioCom.print("-");
-    radioCom.print(gps.time.second());
-
+    dateAndTime = dateAndTime + gps.time.hour() + "-";
+    dateAndTime = dateAndTime + gps.time.minute() + "-";
+    dateAndTime = dateAndTime + gps.time.second() + "-";
   }
   else{
-    radioCom.print("00-00-00");
+    dateAndTime = dateAndTime + "00-00-00";
   }
-  radioCom.print("$");
+  dateAndTime = dateAndTime + "$";
   timeSent = true; 
 }
 
@@ -146,8 +140,6 @@ void sendDateAndTime(){
 float getTemp(){
   sensors.requestTemperatures();
   float tempK = sensors.getTempCByIndex(0) +273.15;
-
-  
   return tempK;
 }
 
@@ -158,7 +150,23 @@ void tempSetup(){
 //ph
 
 float getPh1() {
- return pH.read_ph();
+  for (int i = 0; i < 10; i++) { // Get 10 sample values from the sensor to smooth the value
+    float analogVal = analogRead(SensorPin);
+    buf[i] = -0.02165*(analogVal) + 16.91709;
+    // delay(10);
+  }
+  for (int i = 0; i < 9; i++) { // Sort the analog values from small to large
+    for (int j = i + 1; j < 10; j++) {
+      if (buf[i] > buf[j]) {
+        temp = buf[i];
+        buf[i] = buf[j];
+        buf[j] = temp;
+      }
+    }
+  }
+  float medianPH = buf[4];
+  // delay(500);
+  return medianPH;
 }
 
 
@@ -234,97 +242,135 @@ float getDO(){
     return DO.read_do_percentage();
 }
 
-void debug(){
-  for(int i = 0; i< sendTimes; i++){
+// void debug(){
+//     for(int i = 0; i< sendTimes; i++){
+//       String data = "S1@#";
+//       if(gps.date.isValid()){
+//         data = data+ gps.date.year() + "-";
+//         data = data + gps.date.month() + "-";
+//         data = data + gps.date.day() + "-";
+//       }
+//       else{
+//         data = data + "0000-00-00-";
+//       }
+//       if(gps.time.isValid()){
+//         data = data + gps.time.hour() + "-";
+//         data = data + gps.time.minute() + "-";
+//         data = data + gps.time.second() + "-";
+//       }
+//       else{
+//         data = data + "00-00-00";
+//       }
+//       data = data + "$";
 
-  sendDateAndTime();
-  delay(1000);
-  if(timeSent){
-    Serial.print("@lat#");
-    Serial.print(gpsLat(), 8);
-    Serial.print("$@lon#");
-    Serial.print(gpsLon(), 8);
-    Serial.print("$@temp#");
-    Serial.print(getTemp());
-    Serial.print("$@ph#");
-    Serial.print(getPh1());
-    Serial.print("$@orp#");
-    Serial.print(getORP());
-    Serial.print("$@do#");
-    Serial.print(getDO());
-    Serial.print("$@tds#");
-    Serial.print(getTDS());
-    Serial.print("$%");
-    Serial.print("\n");
-    Serial.println();
-    timeSent = false;
-    delay(100);
-  }
-  }
-}
+//       char lat[14];
+//       dtostrf(gpsLat(),13,8,lat);
+//       data = data + "@lat#" + lat;
+//       char lon[14];
+//       dtostrf(gpsLon(),13,8,lon);
+//       data = data + "$@lon#" + lon;
+//       data = data + "$@temp#" + getTemp();
+//       data = data + "$@ph#" + getPh1();
+//       data = data + "$@orp#" + getORP();
+//       data = data + "$@do#" + getDO();
+//       data = data + "$@tds#" + getTDS();
+//       data = data + "$%";
+//       data = data + "\n";
+//       Serial.println(data);
+//       delay(100); 
+//     }
+//     delay(1000);
+// }
 
 
  void radioSetup(){
   radioCom.begin(9600);
 }
 
-void radioLoop(){
-    // if (tx){
-    if(radioCom.available()){
-    for(int i = 0; i< sendTimes; i++){
-    
-        sendDateAndTime();
-        delay(1000);
-    if(timeSent){
-        radioCom.print("@lat#");
-        radioCom.print(gpsLat(), 8);
-        radioCom.print("$@lon#");
-        radioCom.print(gpsLon(), 8);
-        radioCom.print("$@temp#");
-        radioCom.print(getTemp());
-        radioCom.print("$@ph#");
-        radioCom.print(getPh1());
-        radioCom.print("$@orp#");
-        radioCom.print(getORP());
-        radioCom.print("$@do#");
-        radioCom.print(getDO());
-        radioCom.print("$@tds#");
-        radioCom.print(getTDS());
-        radioCom.print("$%");
-        radioCom.print("\n");
-        timeSent = false; 
-        delay(100); 
-    }
-  }
-    }
-    delay(1000);
+String radioLoop(){
+  if(radioCom.available()){
+      String data = "S1@#";
+      if(gps.date.isValid()){
+        data = data + gps.date.year() + "-";
+        data = data + gps.date.month() + "-";
+        data = data + gps.date.day() + "-";
+      }
+      else{
+      data = data + "0000-00-00-";
+      }
+      if(gps.time.isValid()){
+        data = data + gps.time.hour() + "-";
+        data = data + gps.time.minute() + "-";
+        data = data + gps.time.second() + "-";
+      }
+      else{
+        data = data + "00-00-00";
+      }
+      data = data + "$";
 
-    // tx = false;
-  // }
-  // else{
-  //   if(Serial.available()){
-  //     char data =(char)Serial.read();
-  //     Serial.println(data);
-  //   }
-  //   if(radioCom.available()){
-  //     char data =(char)radioCom.read();
-  //     Serial.println(data);
-  //     tx = true;
-  //   }
-  // }
+      char lat[14];
+      dtostrf(gpsLat(),13,8,lat);
+      data = data + "@lat#" + lat;
+      char lon[14];
+      dtostrf(gpsLon(),13,8,lon);
+      data = data + "$@lon#" + lon;
+      data = data + "$@temp#" + getTemp();
+      data = data + "$@ph#" + getPh1();
+      data = data + "$@orp#" + getORP();
+      data = data + "$@do#" + getDO();
+      data = data + "$@tds#" + getTDS();
+      data = data + "$%";
+      data = data + "\n";
+      return data;
+  } 
+  return "";  
 }
 
 //main 
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(9600);
   gpsSetup();
   radioSetup();
   tempSetup();
 }
 //note: add sensor functions to radioLoop()! It will not work if you add it here! 
 void loop() {
-  radioLoop();
-  debug();
+ 
+      String data = "S1@timestamp#";
+      if(gps.date.isValid()){
+        data = data + gps.date.year() + "-";
+        data = data + gps.date.month() + "-";
+        data = data + gps.date.day() + "-";
+      }
+      else{
+      data = data + "0000-00-00-";
+      }
+      if(gps.time.isValid()){
+        data = data + gps.time.hour() + "-";
+        data = data + gps.time.minute() + "-";
+        data = data + gps.time.second() + "-";
+      }
+      else{
+        data = data + "00-00-00";
+      }
+      data = data + "$";
+
+      char lat[14];
+      dtostrf(gpsLat(),13,8,lat);
+      data = data + "@lat#" + lat;
+      char lon[14];
+      dtostrf(gpsLon(),13,8,lon);
+      data = data + "$@lon#" + lon;
+      data = data + "$@temperature#" + getTemp();
+      data = data + "$@ph#" + getPh1();
+      data = data + "$@orp#" + getORP();
+      data = data + "$@do#" + getDO();
+      data = data + "$@tds#" + getTDS();
+      data = data + "$%";
+      data = data + "\n";
+      radioCom.print(data);
+      Serial.print("boop");
+  //debug();
   delay(1000);
 } 
