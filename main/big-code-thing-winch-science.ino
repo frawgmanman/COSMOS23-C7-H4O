@@ -41,12 +41,18 @@ char eRead(){
 }
 void ethernetLoop(){
    if(ethernetCom.available()){
-    // ethernetCom.print("@temp#");
-    // ethernetCom.print(getTemp());
-    // ethernetCom.print("$@ph#");
-    // ethernetCom.print(getPh1());
-    // ethernetCom.print("$%");
-    ethernetCom.println("AHHHHHHHH");
+    char temp[7];
+    char ph[6];
+    char phHeader[] = "$@ph#";
+    char tempHeader[] = "$@temp";
+    dtostrf(getTemp(), 6, 2, temp);
+    dtostrf(abs(getPh1()), 6, 2, ph);
+    ethernetCom.print(tempHeader);
+    ethernetCom.print(temp);
+    ethernetCom.print(phHeader);
+    ethernetCom.print(ph);
+    ethernetCom.print('$');
+    ethernetCom.print('%');
   
    }
 }
@@ -89,9 +95,13 @@ float getPh1() {
 
 void debug(){
   for(int i = 0; i< sendTimes; i++){
+  char temp[7];
+  char ph[6];
+  dtostrf(getTemp(), 6, 2, temp);
+  dtostrf(abs(getPh1()), 6, 2, ph);
   Serial.print("S1");
-  Serial.print(getTemp());
-  Serial.print(getPh1());
+  Serial.print(temp);
+  Serial.print(ph);
   Serial.print("%\n");
   Serial.println();
   delay(100);
@@ -108,6 +118,10 @@ void setup() {
 }
 //note: add sensor functions to radioLoop()! It will not work if you add it here! 
 void loop() {
+  char justinTears = eRead();
+  while(justinTears != '!'){
+    delay(100);
+  }
   ethernetLoop();
   debug();
 } 

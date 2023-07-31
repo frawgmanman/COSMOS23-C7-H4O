@@ -20,7 +20,8 @@ void loop() {
     Serial.println(" - Dim");
   } else {
     Serial.println(" - Dark");
+    delay(500);
   }
 
-  delay(500);
+  
 }

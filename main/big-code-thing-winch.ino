@@ -11,7 +11,7 @@ static bool justinUp = false;
 static bool justinDown = true;
 
 
-//ethernet
+//mcu comm
 const static byte eRx = 4;
 const static byte eTx = 5;
 SoftwareSerial eCom(eRx, eTx);
@@ -40,10 +40,12 @@ SoftwareSerial radioCom (rxPin, txPin);
 void moveUp(){
     digitalWrite(in1, HIGH);
     digitalWrite(in2, LOW);
+    positionJustin = justin.VALUE;
 }
 void moveDown(){
     digitalWrite(in1, LOW);
     digitalWrite(in2, HIGH);
+    positionJustin = justin.VALUE;
 }
 void stop(){
     digitalWrite(in1, LOW);
@@ -122,12 +124,26 @@ char eRead(){
   
 }
 
+
+
 //radio
 void radioSetup(){
     radioCom.begin(9600);
 }
 void sendRadio(){
     if(radioCom.available()){
+      char data[7]; 
+      int count = 0;
+      char handshakeCheck = eRead();
+      if(handshakeCheck = '#'){
+        while(handshakeCheck!='*'){
+          handshakeCheck = eRead();
+          if(handshakeCheck != '*'){
+          data[count] = eRead();
+          }
+          count++;
+        }
+      }
             radioCom.print("S1@#");
     if(gps.date.isValid()){
         radioCom.print(gps.date.year());
@@ -157,14 +173,16 @@ void sendRadio(){
             radioCom.print(gpsLat(), 8);
             radioCom.print("$@lon#");
             radioCom.print(gpsLon(), 8);
-            char data; 
+            radioCOm.print("$@ph#");
+            radioCom.print(data);
+            
            
-            while(data!='%'){
-              if(eCom.available()){
-                data = eRead();
-                radioCom.print(data);
-              }
-            }
+            // while(data!='%'){
+            //   if(eCom.available()){
+            //     data = eRead();
+            //     radioCom.print(data);
+            //   }
+            // }
           
             radioCom.print("\n");
         
@@ -174,10 +192,19 @@ void sendRadio(){
 void debug(){
   char data;
   
-    while(data!='%'){
-        data = eRead();
-        Serial.print(data);
-    }
+    char data[7]; 
+      int count = 0;
+      char handshakeCheck = eRead();
+      if(handshakeCheck = '#'){
+        while(handshakeCheck!='*'){
+          handshakeCheck = eRead();
+          if(handshakeCheck != '*'){
+          data[count] = eRead();
+          }
+          count++;
+        }
+      }
+    Serial.print(data);
     Serial.print("\n");
     
 }
@@ -192,6 +219,34 @@ eCom.begin(9600);
 }
 
 void loop(){
+moveDown();
+while(positionJustin<=10){ //change logic once directions figured out
+delay(100);
+}
+stop();
+eCom.print('!');
 sendRadio();
+delay(5000);
+moveDown();
+while(positionJustin<=20){
+  delay(100);
+}
+stop();
+eCom.print('!');
+sendRadio();
+delay(5000);
+moveDown();
+while(positionJustin<=30){
+  delay(100);
+}
+stop();
+eCom.print('!');
+sendRadio();
+delay(5000);
+while(positionJustin>0){
+  moveUp();
+}
+stop();
+delay(10000);
 debug();
 }
