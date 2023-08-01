@@ -5,5 +5,5 @@
 
 <h3>Project Timeline</h3>
 <p><b>Week 1:</b> During the first week, we began to investigate our sensors and calibrate them</p>
-
+![Calibration](https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/calibr.jpg?raw=true)
 
