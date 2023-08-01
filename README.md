@@ -7,7 +7,7 @@
 <p><b>Week 1:</b> During the first week, we began to investigate our sensors and calibrate them. </p>
 <img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/calibr.jpg?raw=true width=500 >
 
-<p><b>Week 2:</b> In the second week, we prepared our first buoy for a pool test and our first trip to the lake. We drilled holes in the buoy, wired pH, temperature, radio and GPS to a microcontroller and battery, and set it up inside the buoy to test out at the pool. However, we were not able to fully test our sensors at the pool due to an accident with the batteries, since our transistor was set on 12 volts instead of 5 volts, which caused the microcontroller to start smoking and fried a couple of sensors. For our first lake day, we wired up the rest of the sensors and </p>
-
+<p><b>Week 2:</b> In the second week, we prepared our first buoy for a pool test and our first trip to the lake. We drilled holes in the buoy, wired pH, temperature, radio and GPS to a microcontroller and battery, and set it up inside the buoy to test out at the pool. However, we were not able to fully test our sensors at the pool due to an accident with the batteries, since our transistor was set on 12 volts instead of 5 volts, which caused the microcontroller to start smoking and fried a couple of sensors. For our first lake day, we wired up the rest of the sensors and successfully transmitted data from </p>
+<img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/IMG_0988.jpg?raw=true width=500 >
 
 
