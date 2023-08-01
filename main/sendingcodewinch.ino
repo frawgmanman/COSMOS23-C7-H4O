@@ -2,6 +2,11 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+#include <SimpleEncoder.h>
+#define in1 14 //HIGH CLOCKWISE
+#define in2 15 //HIGH COUNTERCLOCKWISE
+SimpleEncoder justin(0,34,35);
+
 
 long positionJustin = -999;
 // GPIO where the DS18B20 is connected to
@@ -53,16 +58,7 @@ void parse_cmd(char* string) {
   }
 }
 
-
-
-void setup(){
-  Serial.begin(9600);
-  eCom.begin(9600);
-  sensors.begin();
-}
-
-void loop(){
-
+void sendData(){
     if (Serial.available() > 0) {
     user_bytes_received = Serial.readBytesUntil(13, user_data, sizeof(user_data));
   }
@@ -84,4 +80,18 @@ void loop(){
   eCom.print('!');
   delay(100);
   //eCom.print('\n');
+}
+
+
+
+void setup(){
+  Serial.begin(9600);
+  eCom.begin(9600);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  sensors.begin();
+}
+
+void loop(){
+    sendData();
 }
