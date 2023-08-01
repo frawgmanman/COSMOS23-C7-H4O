@@ -9,7 +9,7 @@
 
 <p><b>Week 2:</b> In the second week, we prepared our first buoy for a pool test and our first trip to the lake. We drilled holes in the buoy, wired pH, temperature, radio and GPS to a microcontroller and battery, and set it up inside the buoy to test out at the pool. However, we were not able to fully test our sensors at the pool due to an accident with the batteries, since our transistor was set on 12 volts instead of 5 volts, which caused the microcontroller to start smoking and fried a couple of sensors. For our first lake day, we wired up the rest of the sensors and successfully transmitted data from the buoy to the database.</p>
 <img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/IMG_0988.jpg?raw=true width=500 >
-<img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/fried.jpg?raw=true width=500 >
+<img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/fried.jpg?raw=true width=500>
 <img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/wires.jpg?raw=true width=500 >
 
 <p><b>Week 3:</b> On week three, we prepared all of our sensors and worked on improving the radio for our second lake day. A couple of days before our lake trip, we decided to use String objects and try to send all of the data in one message to the radio, instead of multiple. We also simplified the message structure to make the radio transmission easier and more reliable.</p>
