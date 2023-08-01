@@ -4,6 +4,10 @@
 <p> The code that we used for our sensors can be found in the "Sensors" folder, code for the radio can be found in "telemetry", code for the winch can be found in "testing", and the code that puts all the pieces of our buoy together can be found in the main folder.</p>
 
 <h3>Project Timeline</h3>
-<p><b>Week 1:</b> During the first week, we began to investigate our sensors and calibrate them</p>
-![Calibration](https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/calibr.jpg?raw=true)
+<p><b>Week 1:</b> During the first week, we began to investigate our sensors and calibrate them. </p>
+<img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/calibr.jpg?raw=true width=500 >
+
+<p><b>Week 2:</b> In the second week, we prepared our first buoy for a pool test and our first trip to the lake. We drilled holes in the buoy, wired pH, temperature, radio and GPS to a microcontroller and battery, and set it up inside the buoy to test out at the pool. However, we were not able to fully test our sensors at the pool due to an accident with the batteries, since our transistor was set on 12 volts instead of 5 volts, which caused the microcontroller to start smoking and fried a couple of sensors. For our first lake day, we wired up the rest of the sensors and </p>
+
+
 
