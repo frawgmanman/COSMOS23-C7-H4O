@@ -12,4 +12,7 @@
 <img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/fried.jpg?raw=true width=500 >
 <img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/wires.jpg?raw=true width=500 >
 
+<p><b>Week 3:</b> On week three, we prepared all of our sensors and worked on improving the radio for our second lake day. A couple of days before our lake trip, we decided to use String objects and try to send all of the data in one message to the radio, instead of multiple. We also simplified the message structure to make the radio transmission easier and more reliable.</p>
+<!--<img src=https://github.com/frawgmanman/COSMOS23-C7-H4O/blob/main/photos/__.jpg?raw=true width=500 >-->
+
 
