@@ -20,8 +20,10 @@ void setup() {
 void loop(){
     digitalWrite(in1, LOW);
     digitalWrite(in2, HIGH);
-    //if(justin.CHANGING){
-        positionJustin = justin.VALUE;
-        Serial.println(positionJustin);
-    //}
+    delay(2000);
+    digitalWrite(in1,LOW);
+    digitalWrite(in2, LOW);
+    delay(1000);
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2,LOW);
 }
