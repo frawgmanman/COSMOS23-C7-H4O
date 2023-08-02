@@ -26,22 +26,19 @@ TinyGPSPlus gps;
 void moveDown(){
     digitalWrite(in1, HIGH);
     digitalWrite(in2, LOW);
-    positionJust = justin.VALUE;
+    //positionJust = justin.VALUE;
 }
 void moveUp(){
     digitalWrite(in1, LOW);
     digitalWrite(in2, HIGH);
-    positionJust = justin.VALUE;
 }
 void stop(){
     digitalWrite(in1, LOW);
     digitalWrite(in2, LOW);
-    positionJust = justin.VALUE;
 }
 void move(int rot){
-    while(positionJustin<rot){
-        moveDown();
-    }
+    moveDown();
+    delay(1000);
     stop();
     delay(1000);
 }
@@ -72,7 +69,6 @@ void loop(){
     for(int i = 0; i<10; i++){
         collectData();
     }
-    delay(1000);
     move(40);
     for(int i = 0; i<10; i++){
         radioCom.print("S1");
@@ -94,14 +90,13 @@ void loop(){
         radioCom.print(collectData());
         radioCom.print('%');
     }
-    delay(1000);
     move(60);
     for(int i = 0; i<10; i++){
         collectData();
     }
-    delay(1000);
-    while(justinPosition>0){
+
     moveUp();
-    }
     delay(10000); //move to next waypoint
+    stop();
+    delay(1000);
 }
