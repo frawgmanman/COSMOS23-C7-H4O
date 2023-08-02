@@ -2,8 +2,8 @@
 #include <TinyGPSPlus.h>
 
 #include <SimpleEncoder.h>
-#define in1 14 //HIGH CLOCKWISE
-#define in2 15 //HIGH COUNTERCLOCKWISE
+#define in1 26 //HIGH CLOCKWISE
+#define in2 27 //HIGH COUNTERCLOCKWISE
 SimpleEncoder justin(0,34,35);
 
 //wire
