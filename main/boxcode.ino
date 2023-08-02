@@ -59,6 +59,8 @@ String collectData(){
     return thing;
 }
 void setup(){
+    pinMode(in1,OUTPUT);
+    pinMode(in2,OUTPUT);
     Serial.begin(9600);
     eCom.begin(9600);
     ss.begin(GPSBaud);
